@@ -8,10 +8,10 @@ def home():
     if request.method == "POST":
         query = request.form["user-query"]
         session["query"] = query
-        return redirect(url_for("data"))
+        return redirect(url_for("views.data"))
     else: 
         return render_template("index.html")
 
 @views.route("/data")
 def data():
-    return render_template("data.html", query=session["query"], lemma=session["lemma"])
+    return render_template("data.html", query=session["query"])
