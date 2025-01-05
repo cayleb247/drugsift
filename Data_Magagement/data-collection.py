@@ -63,10 +63,3 @@ def getQueriedAbstracts(query: str):
         articles.append(article)
     
     return pd.DataFrame(articles)
-
-
-df = getQueriedAbstracts("venous thrombosis")
-
-print(df.head())
-print(df.isna().any().any())
-print(df.shape)
