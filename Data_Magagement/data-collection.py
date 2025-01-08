@@ -34,7 +34,7 @@ def get_pubmed_count(query, email=None):
         return None
 
 
-def getQueriedAbstracts(query: str):
+def get_queried_abstracts(query: str):
     '''
     Using NCBI's EDirect Unix command line application, get all abstracts of the user's query.
 
@@ -58,7 +58,8 @@ def getQueriedAbstracts(query: str):
 
     for record in records:
         article = {
-            "abstract": record.get("AB", "")
+            "search-query": query,
+            "abstract": record.get("AB", None)
         }
         articles.append(article)
     

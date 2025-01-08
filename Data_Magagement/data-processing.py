@@ -3,24 +3,10 @@ from spellchecker import SpellChecker
 from multiprocessing import Pool
 import csv
 from itertools import chain
-import config
 import multiprocessing
+import re
 
-def read_csv(file_path):
-    '''
-    Converts csv file to a list of table elements
-
-    Parameters:
-    file_path (str): Path to the csv file
-
-    Returns:
-    list: A list of table elements
-    '''
-    with open(file_path, newline='') as file:
-        reader = csv.reader(file)
-        return [row[0] for row in reader]
-
-def lemmatize_abstracts(abstracts):
+def lemmatize_abstracts(abstracts, n_process=2, batch_size=1000):
     '''
     Use SpaCy's nlp object to tokenize, POS tag, and lemmatize abstract text
 
@@ -36,47 +22,184 @@ def lemmatize_abstracts(abstracts):
 
     lemmas = []
 
-    for doc in nlp.pipe(abstracts, n_process=config.SPACY_NPROCESSES, batch_size=config.SPACY_BATCHES):
+    for doc in nlp.pipe(abstracts, n_process=n_process, batch_size=batch_size):
         lemmas.append([token.lemma_ for token in doc])
     
     return lemmas
 
+class ClinicalFeaturesExtractor:
+    def __init__(self, features_file: str):
+        '''
+        Initialize extractor object with feature file path
 
-def extract_clinical_features(abstract):
-    '''
-    Looks for clinical feature words from a single processed abstract
+        Parameters:
+        features_file (str): Path to clinical features csv file
+        '''
 
-    Parameters:
-    word (str): a single preprocessed word (lemma)
+        self.clinical_features_pattern = re.compile('(' + '|'.join(map(re.escape, self._read_csv(features_file))) + ')$', re.IGNORECASE)
 
-    Returns:
-    list: a list of clinical features taken from the abstract
-    '''
-    suffixes = read_csv("Data/clinical_features.csv")
+    def _read_csv(self, file_path: str):
+        '''
+        Converts csv file to a list of table elements
 
-    clinical_features = []
+        Parameters:
+        file_path (str): Path to the csv file
 
-    for word in abstract:
-        for suffix in suffixes:
-            if word.endswith(suffix):
-                clinical_features.append(word)
+        Returns:
+        set: A set of table elements
+        '''
+        with open(file_path, newline='') as file:
+            reader = csv.reader(file)
+            return set([row[0] for row in reader])
+        
+    def _process_abstract(self, abstract: list):
+        '''
+        Process single abstract, checking against stems and dictionary to find drug compound terms.
 
-    return clinical_features
+        Parameters:
+        abstract (list): list of processed words in abstract
 
-def multiprocess(function, list_):
-    '''
-    Use multiprocessing pool to perform a function on a list
+        Returns:
+        list: list of drug terms
+        '''
+        return [word for word in abstract if self.clinical_features_pattern.search(word)]
+    
+    def extract_clinical_features(self, n_process: int, abstracts: list):
+        '''
+        Use multiprocessing and _process_abstract method to extract drug compounds
 
-    Paramenters:
-    function (func): function to be performed on inputted list
-    list (list): list for function to be performed upon
+        Parameters:
+        n_process: the number of processes to be used when multiprocessing
+        abstracts: a list of preprocessed abstracts
 
-    Returns:
-    list: inputted list after function is mapped onto it
-    '''
+        Returns:
+        list: a list of drug compounds taken from abstracts
+        '''
 
-    if __name__ == "__main__":
-        with Pool(config.POOL_PROCESSES) as p:
-            output_list = p.map(function, list_)
-        return list(chain.from_iterable(output_list))
+        with Pool(n_process) as p:
+            results = p.map(self._process_abstract, abstracts)
+        return list(chain.from_iterable(results))
 
+class DrugCompoundExtractor:
+    def __init__(self, stems_file: str, words_file: str):
+        '''
+        Initialize extractor object with stem and word files paths
+
+        Parameters:
+        stems_file (str): Path to drug stems CSV file
+        words_file (str): Path to text file containing dictionary
+        '''
+
+        # use regular expression pattern for efficient lookup
+        self.drug_stems_pattern = re.compile('|'.join(map(re.escape, self._read_csv(stems_file))))
+
+        # use a set to prevent checking words twice
+        self.spell = SpellChecker()
+        self.spell.word_frequency.load_text_file(words_file)
+        self.known_words = set(self.spell.word_frequency.keys())
+
+
+    def _read_csv(self, file_path: str):
+        '''
+        Converts csv file to a list of table elements
+
+        Parameters:
+        file_path (str): Path to the csv file
+
+        Returns:
+        set: A set of table elements
+        '''
+        with open(file_path, newline='') as file:
+            reader = csv.reader(file)
+            return set([row[0].lower() for row in reader])
+    
+    def _process_abstract(self, abstract: list):
+        '''
+        Process single abstract, checking against stems and dictionary to find drug compound terms.
+
+        Parameters:
+        abstract (list): list of processed words in abstract
+
+        Returns:
+        list: list of drug terms
+        '''
+        return [word for word in abstract if self.drug_stems_pattern.search(word.lower()) 
+            and word.lower() not in self.known_words]
+    
+    def extract_drug_compounds(self, n_process: int, abstracts: list):
+        '''
+        Use multiprocessing and _process_abstract method to extract drug compounds
+
+        Parameters:
+        n_process: the number of processes to be used when multiprocessing
+        abstracts: a list of preprocessed abstracts
+
+        Returns:
+        list: a list of drug compounds taken from abstracts
+        '''
+        # if n_process is defined, if not, number of cpus minus 1 is da
+
+        with Pool(n_process) as p:
+            results = p.map(self._process_abstract, abstracts)
+        return list(chain.from_iterable(results))
+    def __init__(self, stems_file: str, words_file: str):
+        '''
+        Initialize extractor object with stem and word files paths
+
+        Parameters:
+        stems_file (str): Path to drug stems CSV file
+        words_file (str): Path to text file containing dictionary
+        '''
+
+        # use regular expression pattern for efficient lookup
+        self.drug_stems_pattern = re.compile('|'.join(map(re.escape, self._read_csv(stems_file))))
+
+        # use a set to prevent checking words twice
+        self.spell = SpellChecker()
+        self.spell.word_frequency.load_text_file(words_file)
+        self.known_words = set(self.spell.word_frequency.keys())
+
+
+    def _read_csv(self, file_path: str):
+        '''
+        Converts csv file to a list of table elements
+
+        Parameters:
+        file_path (str): Path to the csv file
+
+        Returns:
+        set: A set of table elements
+        '''
+        with open(file_path, newline='') as file:
+            reader = csv.reader(file)
+            return set([row[0].lower() for row in reader])
+    
+    def _process_abstract(self, abstract: list):
+        '''
+        Process single abstract, checking against stems and dictionary to find drug compound terms.
+
+        Parameters:
+        abstract (list): list of processed words in abstract
+
+        Returns:
+        list: list of drug terms
+        '''
+        return [word for word in abstract if self.drug_stems_pattern.search(word.lower()) 
+            and word.lower() not in self.known_words]
+
+    def extract_drug_compounds(self, n_process: int, abstracts: list):
+        '''
+        Use multiprocessing and _process_abstract method to extract drug compounds
+
+        Parameters:
+        n_process: the number of processes to be used when multiprocessing
+        abstracts: a list of preprocessed abstracts
+
+        Returns:
+        list: a list of drug compounds taken from abstracts
+        '''
+
+        with Pool(n_process) as p:
+            results = p.map(self._process_abstract, abstracts)
+        return list(chain.from_iterable(results))
+    

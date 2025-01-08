@@ -8,6 +8,9 @@
 </head>
 <body>
     <h1>our data!</h1>
-    <p>{{query}}</p>
+    {% for abstract in abstracts %}
+        <p>{{abstract.search}}</p>
+        <p>{{abstract.abstract}}</p>
+    {% endfor %}
 </body>
 </html>
