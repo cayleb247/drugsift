@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, session, url_for, redirect
 from . import db
-from .models import Abstracts
+from .models import queryData
 
 views = Blueprint('views', __name__)
 
@@ -11,7 +11,7 @@ def home():
         search = request.form["abstract-search"]
         text = request.form["abstract-text"]
 
-        new_abstract = Abstracts(search=search, abstract=text)
+        new_abstract = queryData(search=search, abstract=text)
         db.session.add(new_abstract)
         db.session.commit()
 
@@ -22,7 +22,7 @@ def home():
 @views.route("/data")
 def data():
 
-    abstracts = Abstracts.query.all()
+    abstracts = queryData.query.all()
 
     print(abstracts)
 

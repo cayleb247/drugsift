@@ -59,7 +59,8 @@ def get_queried_abstracts(query: str):
     for record in records:
         article = {
             "search-query": query,
-            "abstract": record.get("AB", None)
+            "abstract": record.get("AB", ''),
+            "date-published": record.get("DP", '')
         }
         articles.append(article)
     

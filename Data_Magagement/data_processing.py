@@ -78,7 +78,7 @@ class ClinicalFeaturesExtractor:
 
         with Pool(n_process) as p:
             results = p.map(self._process_abstract, abstracts)
-        return list(chain.from_iterable(results))
+        return set(chain.from_iterable(results))
 
 class DrugCompoundExtractor:
     def __init__(self, stems_file: str, words_file: str):
@@ -141,65 +141,4 @@ class DrugCompoundExtractor:
 
         with Pool(n_process) as p:
             results = p.map(self._process_abstract, abstracts)
-        return list(chain.from_iterable(results))
-    def __init__(self, stems_file: str, words_file: str):
-        '''
-        Initialize extractor object with stem and word files paths
-
-        Parameters:
-        stems_file (str): Path to drug stems CSV file
-        words_file (str): Path to text file containing dictionary
-        '''
-
-        # use regular expression pattern for efficient lookup
-        self.drug_stems_pattern = re.compile('|'.join(map(re.escape, self._read_csv(stems_file))))
-
-        # use a set to prevent checking words twice
-        self.spell = SpellChecker()
-        self.spell.word_frequency.load_text_file(words_file)
-        self.known_words = set(self.spell.word_frequency.keys())
-
-
-    def _read_csv(self, file_path: str):
-        '''
-        Converts csv file to a list of table elements
-
-        Parameters:
-        file_path (str): Path to the csv file
-
-        Returns:
-        set: A set of table elements
-        '''
-        with open(file_path, newline='') as file:
-            reader = csv.reader(file)
-            return set([row[0].lower() for row in reader])
-    
-    def _process_abstract(self, abstract: list):
-        '''
-        Process single abstract, checking against stems and dictionary to find drug compound terms.
-
-        Parameters:
-        abstract (list): list of processed words in abstract
-
-        Returns:
-        list: list of drug terms
-        '''
-        return [word for word in abstract if self.drug_stems_pattern.search(word.lower()) 
-            and word.lower() not in self.known_words]
-
-    def extract_drug_compounds(self, n_process: int, abstracts: list):
-        '''
-        Use multiprocessing and _process_abstract method to extract drug compounds
-
-        Parameters:
-        n_process: the number of processes to be used when multiprocessing
-        abstracts: a list of preprocessed abstracts
-
-        Returns:
-        list: a list of drug compounds taken from abstracts
-        '''
-
-        with Pool(n_process) as p:
-            results = p.map(self._process_abstract, abstracts)
-        return list(chain.from_iterable(results))
-    
+        return set(chain.from_iterable(results))
