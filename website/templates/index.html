@@ -1,22 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h1>Caleb's Drug Repurposer 3000</h1>
-    
-    <form action="#" method="post">
-        <label for="search">Abstract Search</label>
-        <input type="text" id="search" name="abstract-search">
-        <label for="text">Abstract Text</label>
-        <input type="text" id="text" name="abstract-text">
-        <input type="submit" value="Submit">
-    </form>
+{% block title %}Home{% endblock %}
 
-</body>
-</html>
+{% block content %}
+
+        <div class="main-content">
+            <div class="heading">
+                <h1>Discover Drug Repurposing Candidates</h1>
+                <h3>Powered by natural language processing and deep learning</h3>
+            </div>
+            <form action="#" method="post">
+                <label for="search">Query Term</label>
+                <input type="text" id="search" name="user-search">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        
+        
+
+        <div class="table-container">
+            <table id="example" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>DiseaseID</th>
+                        <th>Name</th>
+                        <th>Keywords</th>
+                        <th>Alternative Names</th>
+                        <th>Description</th>
+                        <th>Mnemonic</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for disease in disease_data %}
+                        <tr>
+                            <td>{{disease['DiseaseEntryID']}}</td>
+                            <td>{{disease['Name']}}</td>
+                            <td>{{disease['Keywords']}}</td>
+                            <td>{{disease['Alternative Names']}}</td>
+                            <td>{{disease['Description']}}</td>
+                            <td>{{disease['Mnemonic']}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <!-- DataTables JS -->
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+        <script src="../static/table.js"></script>
+{% endblock %}

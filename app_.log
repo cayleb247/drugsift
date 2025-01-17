@@ -1,0 +1,24 @@
+2025-01-17 09:12:35,440 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-01-17 09:12:35,440 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-17 09:12:35,441 - INFO -  * Restarting with stat
+2025-01-17 09:12:36,305 - WARNING -  * Debugger is active!
+2025-01-17 09:12:36,311 - INFO -  * Debugger PIN: 340-917-593
+2025-01-17 09:13:00,668 - INFO -  * Detected change in '/Users/calebwang/repos/scifair25/website/__init__.py', reloading
+2025-01-17 09:13:00,791 - INFO -  * Restarting with stat
+2025-01-17 09:13:01,685 - WARNING -  * Debugger is active!
+2025-01-17 09:13:01,691 - INFO -  * Debugger PIN: 340-917-593
+2025-01-17 09:13:02,704 - INFO -  * Detected change in '/Users/calebwang/repos/scifair25/website/__init__.py', reloading
+2025-01-17 09:13:02,890 - INFO -  * Restarting with stat
+2025-01-17 09:13:03,791 - WARNING -  * Debugger is active!
+2025-01-17 09:13:03,796 - INFO -  * Debugger PIN: 340-917-593
+2025-01-17 09:13:04,820 - INFO -  * Detected change in '/Users/calebwang/repos/scifair25/website/__init__.py', reloading
+2025-01-17 09:13:04,946 - INFO -  * Restarting with stat
+2025-01-17 09:13:05,847 - WARNING -  * Debugger is active!
+2025-01-17 09:13:05,852 - INFO -  * Debugger PIN: 340-917-593
+2025-01-17 09:13:08,897 - INFO -  * Detected change in '/Users/calebwang/repos/scifair25/website/__init__.py', reloading
+2025-01-17 09:13:09,022 - INFO -  * Restarting with stat
+2025-01-17 09:13:09,912 - WARNING -  * Debugger is active!
+2025-01-17 09:13:09,918 - INFO -  * Debugger PIN: 340-917-593
+2025-01-17 09:13:15,990 - INFO -  * Detected change in '/Users/calebwang/repos/scifair25/Misc/logging_.py', reloading
+2025-01-17 09:13:16,112 - INFO -  * Restarting with stat

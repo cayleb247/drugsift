@@ -1,4 +1,4 @@
-from Misc.logging_ import logger
+# from Misc.logging_ import logger
 
 from website.models import queryData
 from website.models import featureScoringData
@@ -14,21 +14,21 @@ from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstra
 from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor
 from Data_Magagement.data_scoring import tfidfScorer
 
-def main(query: str, n_process:int, email=None):
+def getLitData(query: str, n_process:int, email=None):
     app = create_app()
 
-    logger.info("main() successfully called")
+    # logger.info("main() successfully called")
 
     query_count = get_pubmed_count(query, email)
     
     abstract_df = get_queried_abstracts(query)
     retrieved_count = query_count - abstract_df["abstract"].eq('').sum()
 
-    logger.info(f"Able to retrieve {retrieved_count} abstracts")
+    # logger.info(f"Able to retrieve {retrieved_count} abstracts")
 
     abstract_df["lemmas"] = lemmatize_abstracts(abstract_df["abstract"].to_list())
 
-    logger.info("Abstracts successfully retrived and lemmatized")
+    # logger.info("Abstracts successfully retrived and lemmatized")
 
     records = abstract_df.to_dict(orient='records')
 
@@ -41,7 +41,7 @@ def main(query: str, n_process:int, email=None):
         db.session.bulk_save_objects(abstract_data)
         db.session.commit()
 
-    logger.info("Abstracts successfully placed in db")
+    # logger.info("Abstracts successfully placed in db")
 
     breakpoint()
 
@@ -64,7 +64,7 @@ def main(query: str, n_process:int, email=None):
         db.session.bulk_save_objects(feature_data)
         db.session.commit()
 
-    logger.info("Features successfully placed in db")
+    # logger.info("Features successfully placed in db")
 
     # process compound data
     compound_extractor = DrugCompoundExtractor("Data/stems.csv", "Data/words.txt")
@@ -82,16 +82,7 @@ def main(query: str, n_process:int, email=None):
         db.session.bulk_save_objects(compound_data)
         db.session.commit()
 
-    logger.info("Compounds successfully placed in db")
-
-    
-if __name__ == "__main__":
-      
-    main("chronic thromboembolic pulmonary hypertension AND english[Language]", 5, "calebtw8@gmail.com")
-
-    # data = compoundScoringData.query.get(1)
-    # print(data)
-
+    # logger.info("Compounds successfully placed in db")
 
 
     

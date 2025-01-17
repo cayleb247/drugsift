@@ -45,12 +45,12 @@ class tfidfScorer:
         df.reset_index(drop=True, inplace=True)
         return df
     
-corpora = [["the", "analysis", "on", "balls", "analysis"], ["i", "hate", "thrombosis"], ["what", "you", "know", "about", "electrolysis"]]
+# corpora = [["the", "analysis", "on", "balls", "analysis"], ["i", "hate", "thrombosis"], ["what", "you", "know", "about", "electrolysis"]]
 
-term_set = {"analysis", "thrombosis", "electrolysis", "balls"}        
+# term_set = {"analysis", "thrombosis", "electrolysis", "balls"}        
 
-scorer = tfidfScorer(corpora, term_set)
+# scorer = tfidfScorer(corpora, term_set)
 
-df = scorer.aggregate_score("just a test!")
+# df = scorer.aggregate_score("just a test!")
 
-print(df.head())
+# print(df.head())
