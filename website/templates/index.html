@@ -10,13 +10,18 @@
                 <h3>Powered by natural language processing and deep learning</h3>
             </div>
             <form action="#" method="post">
-                <label for="search">Query Term</label>
-                <input type="text" id="search" name="user-search">
-                <input type="submit" value="Submit">
+                <label for="disease-name">Disease Name</label>
+                <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
+                <label for="disease-id">Disease ID</label>
+                <input type="text" id="disease-id" name="disease-id" placeholder="DI-00127">
+                <button type="submit">Start Pipeline</button>
             </form>
         </div>
         
-        
+        <div class="uniprot-heading">
+            <h1>Search UniProt</h1>
+            <h3>Selected Disease's Associated Proteins Used as Targets</h3>
+        </div>
 
         <div class="table-container">
             <table id="example" class="display" style="width:100%">

@@ -30,3 +30,7 @@ def data():
     print(abstracts)
 
     return render_template("data.html", abstracts=abstracts)
+
+@views.route("/tutorial")
+def tutorial():
+    return render_template("tutorial.html")
