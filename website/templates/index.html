@@ -9,45 +9,62 @@
                 <h1>Discover Drug Repurposing Candidates</h1>
                 <h3>Powered by natural language processing and deep learning</h3>
             </div>
-            <form action="#" method="post">
+            <form id="basic-search" action="#" method="post">
                 <label for="disease-name">Disease Name</label>
                 <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
                 <label for="disease-id">Disease ID</label>
                 <input type="text" id="disease-id" name="disease-id" placeholder="DI-00127">
                 <button type="submit">Start Pipeline</button>
             </form>
-        </div>
-        
-        <div class="uniprot-heading">
-            <h1>Search UniProt</h1>
-            <h3>Selected Disease's Associated Proteins Used as Targets</h3>
+            <p>Advanced</p>
+            <dialog>
+                <button autofocus>Close</button>
+                <form id="advanced-search" action="#" method="post">
+                    <label for="disease-name">Disease Name</label>
+                    <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
+                    <label for="disease-id">Disease ID</label>
+                    <input type="text" id="disease-id" name="disease-id" placeholder="DI-00127">
+                    <label for="num-processes">Multiprocessing Processes</label>
+                    <input type="text" id="num-processes" name="num-processes" placeholder="8">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" placeholder="researcher@lab.edu">
+                    <button type="submit">Start Pipeline</button>
+                </form>
+            </dialog>
         </div>
 
-        <div class="table-container">
-            <table id="example" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>DiseaseID</th>
-                        <th>Name</th>
-                        <th>Keywords</th>
-                        <th>Alternative Names</th>
-                        <th>Description</th>
-                        <th>Mnemonic</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for disease in disease_data %}
+        <div class="body-content">
+            <div class="uniprot-heading">
+                <h1>Search UniProt</h1>
+                <h3>Selected Diseases' Associated Proteins Used as Targets</h3>
+            </div>
+    
+            <div class="table-container">
+                <table id="example" class="display" style="width:100%">
+                    <thead>
                         <tr>
-                            <td>{{disease['DiseaseEntryID']}}</td>
-                            <td>{{disease['Name']}}</td>
-                            <td>{{disease['Keywords']}}</td>
-                            <td>{{disease['Alternative Names']}}</td>
-                            <td>{{disease['Description']}}</td>
-                            <td>{{disease['Mnemonic']}}</td>
+                            <th>DiseaseID</th>
+                            <th>Name</th>
+                            <th>Keywords</th>
+                            <th>Alternative Names</th>
+                            <th>Description</th>
+                            <th>Mnemonic</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for disease in disease_data %}
+                            <tr>
+                                <td>{{disease['DiseaseEntryID']}}</td>
+                                <td>{{disease['Name']}}</td>
+                                <td>{{disease['Keywords']}}</td>
+                                <td>{{disease['Alternative Names']}}</td>
+                                <td>{{disease['Description']}}</td>
+                                <td>{{disease['Mnemonic']}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -55,4 +72,5 @@
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <script src="../static/table.js"></script>
+        <script src="../static/script.js"></script>
 {% endblock %}

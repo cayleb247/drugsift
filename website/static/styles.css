@@ -32,12 +32,13 @@ header button {
 }
 
 .main-content{
+    box-sizing: border-box;
+    padding: 4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 30rem;
-    width: 100vw;
+    width: 100%;
     background: #3B7082;
     margin-bottom: 3rem;
 }
@@ -56,7 +57,7 @@ header button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2rem;
+    margin-bottom: 2rem;
 }
 
 .main-content input[type="text"] {
@@ -81,31 +82,47 @@ header button {
     margin: 0.5rem
 }
 
-.main-content button {
+#basic-search button {
     font-weight: 500;
     color: white;
     background-color: #264854;
     padding: 1rem 2rem 1rem 2rem;
     border: none;
     border-radius: 2rem;
+    cursor: pointer;
+}
+
+.main-content button:hover {
+    background-color: #2b444d;
+}
+
+.main-content p {
+    color: white;
+    font-size: 0.75rem;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+
+.main-content p:hover {
+    text-decoration: underline;
 }
 
 
 footer {
+    color: white;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 10rem;
-    background-color: gray;
+    background-color: #3E484D;
     bottom: 0;
     margin-top: 4rem;
 }
 
 #content {
     box-sizing: border-box;
-    padding-left: 8rem;
-    padding-right: 8rem;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -121,13 +138,60 @@ footer {
 }
 
 .uniprot-heading h3 {
-    font-weight: 400;
+    font-weight: 300;
     font-style: italic;
 }
 
 .table-container {
     height: 30rem;
-    border: 1px solid black;
+    /* border: 1px solid #B2B2B2; */
     overflow: scroll;
 }
   
+.table-container input {
+    border-radius: 1rem;
+}
+
+.body-content {
+    padding-left: 8rem;
+    padding-right: 8rem;
+}
+
+#example_wrapper input[type="search"] {
+    border-radius: 1rem;
+}
+
+#example_wrapper input[type="search"]:focus {
+    outline: none;
+}
+
+#example_wrapper {
+    font-family: "Roboto", serif;
+    font-weight: 300;
+}
+
+dialog {
+    flex-direction: column;
+    position: absolute;
+    top: calc(50%);
+    left: calc(50%);
+    transform: translate(-50%, -50%);
+}
+
+dialog form {
+    width: 100%;
+    background-color: black;
+    display: flex;
+    align-items: center;
+}
+
+dialog form button {
+    font-weight: 500;
+    color: white;
+    background-color: #264854;
+    padding: 1rem 2rem 1rem 2rem;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+}
+

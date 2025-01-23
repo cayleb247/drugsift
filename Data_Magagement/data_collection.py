@@ -3,6 +3,7 @@ import subprocess
 from io import StringIO
 from multiprocessing import Pool
 import pandas as pd
+import re
 
 def get_pubmed_count(query, email=None):
     """
@@ -33,6 +34,10 @@ def get_pubmed_count(query, email=None):
     except Exception as e:
         return None
 
+def extract_year(text):
+    pattern = r'\b(19|20)\d{2}\b'  # Matches years from 1900-2099
+    match = re.search(pattern, text)
+    return match.group() if match else ""
 
 def get_queried_abstracts(query: str):
     '''
@@ -60,8 +65,27 @@ def get_queried_abstracts(query: str):
         article = {
             "search-query": query,
             "abstract": record.get("AB", ''),
-            "date-published": record.get("DP", '')
+            "year-published": extract_year(record.get("DP", ''))
         }
         articles.append(article)
     
     return pd.DataFrame(articles)
+
+
+abstracts = get_queried_abstracts("chronic thromboembolic pulmonary hypertension AND english[Language]")
+
+print(abstracts.head())
+
+print(abstracts["year-published"].eq('').sum())
+
+print(abstracts["abstract"][0:5])
+# import re
+
+# def extract_year(text):
+#     pattern = r'\b(19|20)\d{2}\b'  # Matches years from 1900-2099
+#     match = re.search(pattern, text)
+#     return match.group() if match else None
+
+# years = list(map(extract_year, abstracts['date-published']))
+
+# print(years[0:5])
