@@ -1,6 +1,6 @@
 const advQueryOpen = document.querySelector(".main-content p")
 const advQueryDialog = document.querySelector(".main-content dialog")
-const advQueryClose = document.querySelector("dialog button")
+const advQueryClose = document.querySelector("dialog #dialog-close")
 
 advQueryOpen.addEventListener("click", () => {
     advQueryDialog.showModal();

@@ -28,15 +28,15 @@ def getLitData(search_query: str, n_process:int, email=None):
 
     abstract_df["lemmas"] = lemmatize_abstracts(abstract_df["abstract"].to_list())
 
-    print(abstract_df.head())
-    breakpoint()
+    # print(abstract_df.head())
+    # breakpoint()
 
     # logger.info("Abstracts successfully retrived and lemmatized")
 
     records = abstract_df.to_dict(orient='records')
 
-    print(records[0])
-    breakpoint()
+    # print(records[0])
+    # breakpoint()
     # place abstract data in SQLite
     with app.app_context():
 
@@ -46,8 +46,8 @@ def getLitData(search_query: str, n_process:int, email=None):
 
     # logger.info("Abstracts successfully placed in db")
 
-    print(abstract_df["abstract"].tolist()[0])
-    breakpoint()
+    # print(abstract_df["abstract"].tolist()[0])
+    # breakpoint()
 
     # process feature data
     feature_extractor = ClinicalFeaturesExtractor("Data/clinical_features.csv")
@@ -59,11 +59,14 @@ def getLitData(search_query: str, n_process:int, email=None):
 
     feature_df = tfidf.get_comprehensive_terms(list(features))
 
-    print(feature_df.head())
-    breakpoint()
+    # print(feature_df.head())
+    # breakpoint()
 
     # place scored feature data in SQLite
     records = feature_df.to_dict(orient='records')
+
+    # print(records[0]["total_score"])
+    # breakpoint()
 
     with app.app_context():
 
@@ -81,7 +84,7 @@ def getLitData(search_query: str, n_process:int, email=None):
 
     compound_df = tfidf.get_comprehensive_terms(list(compounds))
 
-    print(compound_df.head())
+    print(compound_df.head(100))
     breakpoint()
 
     # place scored compound data in SQLite
@@ -96,4 +99,4 @@ def getLitData(search_query: str, n_process:int, email=None):
     # logger.info("Compounds successfully placed in db")
 
 
-# getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, "calebtw8@gmail.com")
+getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, "calebtw8@gmail.com")

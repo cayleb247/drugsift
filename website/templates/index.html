@@ -18,18 +18,28 @@
             </form>
             <p>Advanced</p>
             <dialog>
-                <button autofocus>Close</button>
-                <form id="advanced-search" action="#" method="post">
-                    <label for="disease-name">Disease Name</label>
-                    <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
-                    <label for="disease-id">Disease ID</label>
-                    <input type="text" id="disease-id" name="disease-id" placeholder="DI-00127">
-                    <label for="num-processes">Multiprocessing Processes</label>
-                    <input type="text" id="num-processes" name="num-processes" placeholder="8">
-                    <label for="email">Email</label>
-                    <input type="text" id="email" name="email" placeholder="researcher@lab.edu">
-                    <button type="submit">Start Pipeline</button>
-                </form>
+                <div class="dialog-content">
+                    <svg id="dialog-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <!-- <button autofocus>Close</button> -->
+                    <form id="advanced-search" action="#" method="post">
+                        <label for="disease-name">Disease Name</label>
+                        <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
+                        <label for="disease-id">Disease ID</label>
+                        <input type="text" id="disease-id" name="disease-id" placeholder="DI-00127">
+                        <div class="advanced-container">
+                            <div class="advanced-inputs">
+                                <label for="num-processes">Multiprocessing</label>
+                                <input type="text" id="num-processes" name="num-processes" placeholder="Number of Processes">
+                            </div>
+                            <div class="advanced-inputs">
+                                <label for="email">Email</label>
+                                <input type="text" id="email" name="email" placeholder="researcher@lab.edu">
+                            </div>
+                        </div>
+                        <button type="submit">Start Pipeline</button>
+                    </form>
+
+                </div>
             </dialog>
         </div>
 

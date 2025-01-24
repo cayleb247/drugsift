@@ -4,7 +4,7 @@
     margin: 0;
 }
 
-h1, h2, h3, p, input, button {
+h1, h2, h3, p, input, button, form {
     font-family: "Roboto", serif;
 }
 
@@ -60,7 +60,7 @@ header button {
     margin-bottom: 2rem;
 }
 
-.main-content input[type="text"] {
+#basic-search input[type="text"] {
     margin-bottom: 2rem;
     width: 100%;
     padding: .5rem;
@@ -68,7 +68,7 @@ header button {
     border: none;
 }
 
-.main-content form {
+#basic-search {
     font-family: "Roboto", serif;
     color: white;
     font-size: 1rem;
@@ -171,21 +171,51 @@ footer {
 }
 
 dialog {
-    flex-direction: column;
-    position: absolute;
+    border: 1px solid grey;
+    border-radius: 1rem;
     top: calc(50%);
     left: calc(50%);
     transform: translate(-50%, -50%);
 }
 
-dialog form {
+.dialog-content {
     width: 100%;
-    background-color: black;
+    color: black;
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
-dialog form button {
+.dialog-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem;
+}
+
+.dialog-content input {
+    width: 100%;
+}
+
+#advanced-search input {
+    padding: .5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+}
+
+dialog svg {
+    stroke: gray;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    cursor: pointer;
+}
+
+dialog svg:hover {
+    stroke: rgba(128, 128, 128, 0.5);
+}
+
+dialog button {
     font-weight: 500;
     color: white;
     background-color: #264854;
@@ -193,5 +223,19 @@ dialog form button {
     border: none;
     border-radius: 2rem;
     cursor: pointer;
+    margin-top: 1rem;
 }
+
+.advanced-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.advanced-container {
+    display: flex;
+    gap: 2rem;
+}
+
+
 
