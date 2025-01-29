@@ -29,13 +29,10 @@ def lemmatize_abstracts(abstracts, n_process=2, batch_size=1000):
 
     nlp = spacy.load('en_core_web_sm', disable=["parser", "ner"]) # SpaCy thingy
 
-    stop_word_set = stop_words.STOP_WORDS
-    punctuations = list(punctuation)
-
     lemmas = []
 
     for doc in nlp.pipe(abstracts, n_process=n_process, batch_size=batch_size):
-        lemmas.append([token.lemma_ for token in doc if token not in stop_word_set and token not in punctuations])
+        lemmas.append([token.lemma_ for token in doc if not token.is_stop and not token.is_punct])
     
     return lemmas
 
@@ -158,6 +155,7 @@ class DrugCompoundExtractor:
     
 class DiseaseTermsExtractor:
     def __init__(self, 
+                 search_query: str,
                  min_ngram_size: int = 2,
                  max_ngram_size: int = 5,
                  min_frequency: int = 5,
@@ -171,6 +169,7 @@ class DiseaseTermsExtractor:
             min_frequency: Minimum frequency threshold for n-grams
             window_size: Number of words to look at before and after clinical features
         """
+        self.search_query = search_query
         self.min_ngram_size = min_ngram_size
         self.max_ngram_size = max_ngram_size
         self.min_frequency = min_frequency
@@ -218,6 +217,7 @@ class DiseaseTermsExtractor:
         self.ngram_frequencies = Counter()
         
         for doc in tqdm(documents, desc="Processing documents"):
+            doc = ' '.join(doc)
             # Tokenize document
             tokens = nltk.word_tokenize(doc.lower())
             
@@ -246,6 +246,7 @@ class DiseaseTermsExtractor:
         # Convert to DataFrame for easy analysis
         df = pd.DataFrame([
             {
+                'search_query': self.search_query,
                 'disease_term': ' '.join(ngram),
                 'frequency': freq
             }

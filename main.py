@@ -3,6 +3,7 @@
 from website.models import queryData
 from website.models import featureScoringData
 from website.models import compoundScoringData
+from website.models import associatedDiseases
 
 from website import db, create_app
 
@@ -15,7 +16,22 @@ from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
 remove_terms = {"diagnosis", "analysis"}
 
-def getLitData(search_query: str, n_process:int, email=None):
+def getLitData(search_query: str, n_process:int, first_disease, email=None, user_remove_terms=[]):
+    '''
+    Processes an entire disease query
+
+    Params:
+    search_query (str): the user-inputted disease query
+    n_process (int): the number of multiprocessing processes to use
+    first_disease: whether the query is the first disease (original input) or the associated disease (secondary input), 1 for original, 0 for associated
+    email (str): user's email for pubmed api
+    user_remove_terms (list): a list of user-inputted terms to reduce noise in output
+    
+    '''
+    if len(user_remove_terms) > 0: # check if user inputted any remove terms
+        for term in user_remove_terms: # add terms to remove_terms set
+            remove_terms.add(term)
+
     app = create_app()
 
     # logger.info("main() successfully called")
@@ -104,24 +120,36 @@ def getLitData(search_query: str, n_process:int, email=None):
 
     # logger.info("Compounds successfully placed in db")
 
-    extractor = DiseaseTermsExtractor(
-        min_ngram_size=2,
-        max_ngram_size=5,
-        min_frequency=2
-    )
+    if first_disease == 1:
 
-     # Set clinical features and process documents
-    extractor.set_clinical_features(list(features))
+        extractor = DiseaseTermsExtractor(
+            min_ngram_size=2,
+            max_ngram_size=5,
+            min_frequency=2
+        )
 
-    print(abstract_df["lemmas"].head())
-    print(abstract_df["abstract"].head())
-    breakpoint()
-    extractor.fit(abstract_df["lemmas"])
-    
-    # Get disease terms
-    disease_terms_df = extractor.get_disease_terms()
+        # Set clinical features and process documents
+        extractor.set_clinical_features(list(features))
 
-    print(disease_terms_df.head(10))
+        print(abstract_df["lemmas"].head())
+        print(abstract_df["abstract"].head())
+        breakpoint()
+        extractor.fit(abstract_df["lemmas"])
+        
+        # Get disease terms
+        disease_terms_df = extractor.get_disease_terms()
+
+        print(disease_terms_df.head(20))
+
+        records = disease_terms_df.to_dict(orient='records')
+
+        with app.app_context():
+
+            feature_data = [associatedDiseases(search=record["search_query"], feature_term=record["disease_term"], frequency=record["frequency"]) for record in records]
+            db.session.bulk_save_objects(feature_data)
+            db.session.commit()
 
 
-getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, "calebtw8@gmail.com")
+getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, 1, "calebtw8@gmail.com")
+
+# def trainWord2Vec():

@@ -2,6 +2,8 @@ from . import db
 from sqlalchemy.types import JSON
 
 class queryData(db.Model):
+    __tablename__ = "queryData"
+
     id = db.Column(db.Integer, primary_key=True)
     search = db.Column(db.String(150))
     abstract = db.Column(db.String(1000))
@@ -18,7 +20,7 @@ class compoundScoringData(db.Model):
     tfidf_score = db.Column(db.Float)
 
     def __repr__(self):
-        return f"<compoundData(id={self.id}, search='{self.search}', term='{self.compound_term}', tfidf_score={self.tfidf_score})>"
+        return f"<compoundScoringData(id={self.id}, search='{self.search}', term='{self.compound_term}', tfidf_score={self.tfidf_score})>"
     
 class featureScoringData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,4 +29,14 @@ class featureScoringData(db.Model):
     tfidf_score = db.Column(db.Float)
 
     def __repr__(self):
-        return f"<featureData(id={self.id}, search='{self.search}', term='{self.feature_term}', tfidf_score={self.tfidf_score})>"
+        return f"<featureScoringData(id={self.id}, search='{self.search}', term='{self.feature_term}', tfidf_score={self.tfidf_score})>"
+    
+class associatedDiseases(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    search = db.Column(db.String(150))
+    disease_term = db.Column(db.String(100))
+    frequency = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<associatedDiseases(id={self.id}, search='{self.search}', disease_term='{self.disease_term}', frequency={self.frequency})>"
+    
