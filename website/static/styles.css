@@ -232,7 +232,7 @@ dialog button {
     align-items: center;
 }
 
-.advanced-container {
+.horizontal-container {
     display: flex;
     gap: 2rem;
 }

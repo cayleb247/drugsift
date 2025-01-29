@@ -9,10 +9,11 @@ from website import db, create_app
 import pandas as pd
 from multiprocessing import Pool
 
-
 from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstracts
-from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor
-from Data_Magagement.data_scoring import TemporalTFIDF
+from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor, DiseaseTermsExtractor
+from Data_Magagement.data_scoring import HybridTemporalTFIDF
+
+remove_terms = {"diagnosis", "analysis"}
 
 def getLitData(search_query: str, n_process:int, email=None):
     app = create_app()
@@ -50,17 +51,17 @@ def getLitData(search_query: str, n_process:int, email=None):
     # breakpoint()
 
     # process feature data
-    feature_extractor = ClinicalFeaturesExtractor("Data/clinical_features.csv")
+    feature_extractor = ClinicalFeaturesExtractor("Data/clinical_features.csv", remove_terms)
     features = feature_extractor.extract_clinical_features(n_process, abstract_df["lemmas"].to_list())
     feature_intervals = abstract_df["year-published"].to_list()
 
-    tfidf = TemporalTFIDF(search_query, recency_weight=0.1)
+    tfidf = HybridTemporalTFIDF(search_query, recency_weight=0.1)
     tfidf.fit(abstract_df['lemmas'].to_list(), feature_intervals)
 
     feature_df = tfidf.get_comprehensive_terms(list(features))
 
-    # print(feature_df.head())
-    # breakpoint()
+    print(feature_df.head())
+    breakpoint()
 
     # place scored feature data in SQLite
     records = feature_df.to_dict(orient='records')
@@ -80,11 +81,16 @@ def getLitData(search_query: str, n_process:int, email=None):
     compound_extractor = DrugCompoundExtractor("Data/stems.csv", "Data/words.txt")
     compounds = compound_extractor.extract_drug_compounds(n_process, abstract_df["lemmas"].to_list())
 
-    tfidf.fit(abstract_df['lemmas'].to_list(), feature_intervals)
+    print(list(compounds)[:10])
+    breakpoint()
+
+    # tfidf.fit(abstract_df['lemmas'].to_list(), feature_intervals)
 
     compound_df = tfidf.get_comprehensive_terms(list(compounds))
 
     print(compound_df.head(100))
+    bob_row = compound_df.loc[compound_df['term'] == 'riociguat']
+    print(bob_row)
     breakpoint()
 
     # place scored compound data in SQLite
@@ -97,6 +103,25 @@ def getLitData(search_query: str, n_process:int, email=None):
         db.session.commit()
 
     # logger.info("Compounds successfully placed in db")
+
+    extractor = DiseaseTermsExtractor(
+        min_ngram_size=2,
+        max_ngram_size=5,
+        min_frequency=2
+    )
+
+     # Set clinical features and process documents
+    extractor.set_clinical_features(list(features))
+
+    print(abstract_df["lemmas"].head())
+    print(abstract_df["abstract"].head())
+    breakpoint()
+    extractor.fit(abstract_df["lemmas"])
+    
+    # Get disease terms
+    disease_terms_df = extractor.get_disease_terms()
+
+    print(disease_terms_df.head(10))
 
 
 getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, "calebtw8@gmail.com")
