@@ -1,6 +1,7 @@
 from website.models import queryData
 from website.models import featureScoringData
 from website.models import compoundScoringData
+from website.models import associatedDiseases
 
 from website import db, create_app
 

@@ -1,4 +1,5 @@
 # from Misc.logging_ import logger
+from flask import session
 
 from website.models import queryData
 from website.models import featureScoringData
@@ -14,9 +15,7 @@ from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstra
 from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor, DiseaseTermsExtractor
 from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
-remove_terms = {"diagnosis", "analysis"}
-
-def getLitData(search_query: str, n_process:int, first_disease, email=None, user_remove_terms=[]):
+def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[]):
     '''
     Processes an entire disease query
 
@@ -28,18 +27,31 @@ def getLitData(search_query: str, n_process:int, first_disease, email=None, user
     user_remove_terms (list): a list of user-inputted terms to reduce noise in output
     
     '''
+    remove_terms = {"diagnosis", "analysis"}
+
     if len(user_remove_terms) > 0: # check if user inputted any remove terms
         for term in user_remove_terms: # add terms to remove_terms set
             remove_terms.add(term)
 
     app = create_app()
 
+    with app.app_context():
+
+        db.drop_all()
+        db.create_all() 
+
     # logger.info("main() successfully called")
 
     query_count = get_pubmed_count(search_query, email)
     
     abstract_df = get_queried_abstracts(search_query)
-    retrieved_count = query_count - abstract_df["abstract"].eq('').sum()
+
+    # place the number of retrived abstract in session
+    retrieved_abstracts = query_count - abstract_df["abstract"].eq('').sum()
+    total_abstracts = query_count
+
+    abstract_df["retrieved_abstracts"] = retrieved_abstracts
+    abstract_df["total_abstracts"] = total_abstracts
 
     # logger.info(f"Able to retrieve {retrieved_count} abstracts")
 
@@ -52,12 +64,16 @@ def getLitData(search_query: str, n_process:int, first_disease, email=None, user
 
     records = abstract_df.to_dict(orient='records')
 
-    # print(records[0])
     # breakpoint()
     # place abstract data in SQLite
     with app.app_context():
 
-        abstract_data = [queryData(search=record["search-query"], abstract=record["abstract"], year=record["year-published"], lemmas=record["lemmas"]) for record in records]
+        abstract_data = [queryData(search=record["search-query"], 
+                                   abstract=record["abstract"], 
+                                   year=record["year-published"], 
+                                   lemmas=record["lemmas"], 
+                                   retrieved=record["retrieved_abstracts"], 
+                                   total=record["total_abstracts"]) for record in records]
         db.session.bulk_save_objects(abstract_data)
         db.session.commit()
 
@@ -76,18 +92,15 @@ def getLitData(search_query: str, n_process:int, first_disease, email=None, user
 
     feature_df = tfidf.get_comprehensive_terms(list(features))
 
-    print(feature_df.head())
-    breakpoint()
-
     # place scored feature data in SQLite
-    records = feature_df.to_dict(orient='records')
+    feature_records = feature_df.to_dict(orient='records')
 
     # print(records[0]["total_score"])
     # breakpoint()
 
     with app.app_context():
 
-        feature_data = [featureScoringData(search=record["search_query"], feature_term=record["term"], tfidf_score=record["total_score"]) for record in records]
+        feature_data = [featureScoringData(search=record["search_query"], feature_term=record["term"], tfidf_score=record["total_score"]) for record in feature_records]
         db.session.bulk_save_objects(feature_data)
         db.session.commit()
 
@@ -97,59 +110,42 @@ def getLitData(search_query: str, n_process:int, first_disease, email=None, user
     compound_extractor = DrugCompoundExtractor("Data/stems.csv", "Data/words.txt")
     compounds = compound_extractor.extract_drug_compounds(n_process, abstract_df["lemmas"].to_list())
 
-    print(list(compounds)[:10])
-    breakpoint()
-
-    # tfidf.fit(abstract_df['lemmas'].to_list(), feature_intervals)
-
     compound_df = tfidf.get_comprehensive_terms(list(compounds))
 
-    print(compound_df.head(100))
-    bob_row = compound_df.loc[compound_df['term'] == 'riociguat']
-    print(bob_row)
-    breakpoint()
-
     # place scored compound data in SQLite
-    records = compound_df.to_dict(orient='records')
+    compound_records = compound_df.to_dict(orient='records')
 
     with app.app_context():
 
-        compound_data = [compoundScoringData(search=record["search_query"], compound_term=record["term"], tfidf_score=record["total_score"]) for record in records]
+        compound_data = [compoundScoringData(search=record["search_query"], compound_term=record["term"], tfidf_score=record["total_score"]) for record in compound_records]
         db.session.bulk_save_objects(compound_data)
         db.session.commit()
 
     # logger.info("Compounds successfully placed in db")
 
-    if first_disease == 1:
 
-        extractor = DiseaseTermsExtractor(
-            min_ngram_size=2,
-            max_ngram_size=5,
-            min_frequency=2
-        )
+    extractor = DiseaseTermsExtractor(
+        search_query,
+        min_ngram_size=2,
+        max_ngram_size=5,
+        min_frequency=2
+    )
 
-        # Set clinical features and process documents
-        extractor.set_clinical_features(list(features))
+    # Set clinical features and process documents
+    extractor.set_clinical_features(list(features))
 
-        print(abstract_df["lemmas"].head())
-        print(abstract_df["abstract"].head())
-        breakpoint()
-        extractor.fit(abstract_df["lemmas"])
-        
-        # Get disease terms
-        disease_terms_df = extractor.get_disease_terms()
+    # print(abstract_df["lemmas"].head())
+    # print(abstract_df["abstract"].head())
 
-        print(disease_terms_df.head(20))
+    extractor.fit(abstract_df["lemmas"])
+    
+    # Get disease terms
+    disease_terms_df = extractor.get_disease_terms()
 
-        records = disease_terms_df.to_dict(orient='records')
+    records = disease_terms_df.to_dict(orient='records')
 
-        with app.app_context():
+    with app.app_context():
+        feature_data = [associatedDiseases(search=record["search_query"], disease_term=record["disease_term"], frequency=record["frequency"]) for record in records]
+        db.session.bulk_save_objects(feature_data)
+        db.session.commit()
 
-            feature_data = [associatedDiseases(search=record["search_query"], feature_term=record["disease_term"], frequency=record["frequency"]) for record in records]
-            db.session.bulk_save_objects(feature_data)
-            db.session.commit()
-
-
-getLitData("chronic thromboembolic pulmonary hypertension AND english[Language]", 8, 1, "calebtw8@gmail.com")
-
-# def trainWord2Vec():

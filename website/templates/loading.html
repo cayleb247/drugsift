@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Tutorial{% endblock %}
+
+{% block content %}
+    <h1>Pipeline Working</h1>
+
+    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+
+{% endblock %}
+
+{% block script %}
+    <script>window.location.href = "{{ url_for('views.data') }}"</script>
+{% endblock %}

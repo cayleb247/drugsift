@@ -1,16 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
-</head>
-<body>
-    <h1>our data!</h1>
-    {% for abstract in abstracts %}
-        <p>{{abstract.search}}</p>
-        <p>{{abstract.abstract}}</p>
-    {% endfor %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Tutorial{% endblock %}
+
+{% block content %}
+    <div class="data-heading">
+        <h1>Data Summary</h1>
+        <p>Number of Abstracts Retrieved: {{abstracts.retrieved}}</p>
+        <p>Number of Abstracts Available: {{abstracts.total}}</p>
+    </div>
+    
+
+
+    <h2>Extracted Compounds</h2>
+    <p><em>May contain noise</em></p>
+    <div class="table-container" id="output-table">
+        <table id="compounds" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>TF-IDF Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for compound in compounds %}
+                    <tr>
+                        <td>{{compound.compound_term}}</td>
+                        <td>{{compound.tfidf_score}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Extracted Diseases</h2>
+    <p><em>May contain noise</em></p>
+    <div class="table-container" id="output-table">
+        <table id="features" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>TF-IDF Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feature in features %}
+                    <tr>
+                        <td>{{feature.feature_term}}</td>
+                        <td>{{feature.tfidf_score}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Associated Diseases</h2>
+    <p><em>May contain noise</em></p>
+    <div class="table-container" id="output-table">
+        <table id="diseases" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Frequency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disease in diseases %}
+                    <tr>
+                        <td>{{disease.disease_term}}</td>
+                        <td>{{disease.frequency}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="disease-container">
+        <h2>Select an Associated Disease</h2>
+        <p>Repeats Text Mining</p>
+        <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
+            <label for="disease-name">Disease Name</label>
+            <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
+            <button type="submit">Start Pipeline</button>
+        </form>
+
+    </div>
+    
+
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script src="../static/table.js"></script>
+{% endblock %}

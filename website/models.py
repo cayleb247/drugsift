@@ -9,9 +9,11 @@ class queryData(db.Model):
     abstract = db.Column(db.String(1000))
     year = db.Column(db.String(150))
     lemmas = db.Column (db.JSON)
+    retrieved = db.Column(db.String(100))
+    total = db.Column(db.String(100))
 
     def __repr__(self):
-        return f"<queryData(id={self.id}, search='{self.search}', abstract='{self.abstract}', year={self.year}, lemmas={self.lemmas})>"
+        return f"<queryData(id={self.id}, search='{self.search}', abstract='{self.abstract}', year={self.year}, lemmas={self.lemmas}, retrieved_abstracts={self.retrieved}, total_abstracts={self.total})>"
 
 class compoundScoringData(db.Model):
     id = db.Column(db.Integer, primary_key=True)

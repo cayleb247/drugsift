@@ -1,5 +1,4 @@
 from website import create_app
-from main import getLitData
 from website.models import compoundScoringData
 
 app = create_app()

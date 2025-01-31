@@ -82,7 +82,7 @@ header button {
     margin: 0.5rem
 }
 
-#basic-search button {
+#basic-search button, #disease-selection button {
     font-weight: 500;
     color: white;
     background-color: #264854;
@@ -143,7 +143,7 @@ footer {
 }
 
 .table-container {
-    height: 30rem;
+    max-height: 30rem;
     /* border: 1px solid #B2B2B2; */
     overflow: scroll;
 }
@@ -157,15 +157,24 @@ footer {
     padding-right: 8rem;
 }
 
-#example_wrapper input[type="search"] {
+#uniprot_wrapper input[type="search"],
+#compounds_wrapper input[type="search"],
+#features_wrapper input[type="search"],
+#diseases_wrapper input[type="search"] {
     border-radius: 1rem;
 }
 
-#example_wrapper input[type="search"]:focus {
+#uniprot_wrapper input[type="search"]:focus,
+#compounds_wrapper input[type="search"]:focus,
+#features_wrapper input[type="search"]:focus,
+#diseases_wrapper input[type="search"]:focus {
     outline: none;
 }
 
-#example_wrapper {
+#uniprot_wrapper,
+#compounds_wrapper,
+#features_wrapper,
+#diseases_wrapper {
     font-family: "Roboto", serif;
     font-weight: 300;
 }
@@ -197,7 +206,7 @@ dialog {
     width: 100%;
 }
 
-#advanced-search input {
+#advanced-search input, #disease-selection input {
     padding: .5rem;
     border-radius: 1rem;
     border: 1px solid rgba(128, 128, 128, 0.5);
@@ -236,6 +245,107 @@ dialog button {
     display: flex;
     gap: 2rem;
 }
+
+.disease-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#disease-selection {
+    font-family: "Roboto", serif;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+#disease-selection input {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    width: 50%;
+    border: 1px solid grey;
+}
+
+#output-table {
+    margin-bottom: 4rem;
+}
+
+.data-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0 2rem 0;
+}
+
+/* Loader Animation */
+
+.lds-ellipsis,
+.lds-ellipsis div {
+  box-sizing: border-box;
+}
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 33.33333px;
+  width: 13.33333px;
+  height: 13.33333px;
+  border-radius: 50%;
+  background: currentColor;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+
+
 
 
 
