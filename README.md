@@ -1,6 +1,6 @@
 # DrugSift
 
-DrugSift is a web application that aims to combine the latest tools in deep learning and biomedical knowledge into an integrated pipeline for drug discovery and repurposing.
+DrugSift is a web application that aims to combine the latest tools in deep learning and biomedical knowledge into an integrated pipeline for drug discovery and repurposing. We hope to help democratize the modern drug repurposing for all researchers interested. A simple UI is designed for ease of use.
 
 ## How it works
 
