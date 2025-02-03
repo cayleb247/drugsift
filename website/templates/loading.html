@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Tutorial{% endblock %}
+{% block title %}Loading{% endblock %}
 
 {% block content %}
-    <h1>Pipeline Working</h1>
+    <div class="loading-container">
+        <h1>Pipeline Working</h1><br>
 
-    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        <h2>Getting data for</h2>
+        <p>"{{disease_name}}"</p>
+    
+        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+    
 
 {% endblock %}
 

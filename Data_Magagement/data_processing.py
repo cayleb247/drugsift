@@ -14,6 +14,8 @@ from nltk.util import ngrams
 import pandas as pd
 from tqdm import tqdm
 
+from Drugs_Proteins.pubchem_api import check_if_drug
+
 
 def lemmatize_abstracts(abstracts, n_process=2, batch_size=1000):
     '''
@@ -133,7 +135,7 @@ class DrugCompoundExtractor:
         Returns:
         list: list of drug terms
         '''
-        return [word for word in abstract if self.drug_stems_pattern.search(word.lower()) 
+        return [word.lower() for word in abstract if self.drug_stems_pattern.search(word.lower()) 
             and word.lower() not in self.known_words]
     
     def extract_drug_compounds(self, n_process: int, abstracts: list):

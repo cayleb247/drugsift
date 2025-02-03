@@ -15,6 +15,10 @@ from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstra
 from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor, DiseaseTermsExtractor
 from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
+from Drugs_Proteins.pubchem_api import check_if_drug
+
+from Models import word_2_vec
+
 def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[]):
     '''
     Processes an entire disease query
@@ -35,12 +39,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
 
     app = create_app()
 
-    with app.app_context():
-
-        db.drop_all()
-        db.create_all() 
-
-    # logger.info("main() successfully called")
+    print("main() successfully called")
 
     query_count = get_pubmed_count(search_query, email)
     
@@ -53,7 +52,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     abstract_df["retrieved_abstracts"] = retrieved_abstracts
     abstract_df["total_abstracts"] = total_abstracts
 
-    # logger.info(f"Able to retrieve {retrieved_count} abstracts")
+    print(f"Able to retrieve {retrieved_abstracts} abstracts")
 
     abstract_df["lemmas"] = lemmatize_abstracts(abstract_df["abstract"].to_list())
 
@@ -109,6 +108,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     # process compound data
     compound_extractor = DrugCompoundExtractor("Data/stems.csv", "Data/words.txt")
     compounds = compound_extractor.extract_drug_compounds(n_process, abstract_df["lemmas"].to_list())
+    # compounds = check_if_drug(list(compounds)) # denoise compound list by checking for SMILES string
 
     compound_df = tfidf.get_comprehensive_terms(list(compounds))
 
@@ -149,3 +149,12 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
         db.session.bulk_save_objects(feature_data)
         db.session.commit()
 
+def resetDatabase():
+
+    # recreate database
+    app = create_app()
+
+    with app.app_context():
+
+        db.drop_all()
+        db.create_all() 

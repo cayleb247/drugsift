@@ -73,16 +73,29 @@
             </tbody>
         </table>
     </div>
-    <div class="disease-container">
-        <h2>Select an Associated Disease</h2>
-        <p>Repeats Text Mining</p>
-        <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
-            <label for="disease-name">Disease Name</label>
-            <input type="text" id="disease-name" name="disease-name" placeholder="venous thrombosis">
-            <button type="submit">Start Pipeline</button>
-        </form>
 
-    </div>
+    {% if data_type == "original-disease"%}
+        <div class="disease-container">
+            <h2>Select an Associated Disease</h2>
+            <p>Repeats Text Mining</p>
+            <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
+                <input type="hidden" name="form_id" value="form2">
+                <label for="disease-name">Disease Name</label>
+                <input type="text" id="disease-name" name="associated-disease" placeholder="venous thrombosis">
+                <button type="submit">Start Pipeline</button>
+            </form>
+
+        </div>
+    {% elif data_type == "associated-disease" %}
+        <div class="disease-container">
+            <h2>Train Word2Vec Model</h2>
+            <p>Create associations between terms</p>
+            <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
+                <button type="submit">Train Model</button>
+            </form>
+        </div>
+    {% endif %}
+    
     
 
 

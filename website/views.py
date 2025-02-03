@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, session, url_for, redirect
 from main import getLitData
+from main import resetDatabase
 from . import db
 from .models import queryData
 import json
@@ -23,25 +24,59 @@ def home():
 def loading():
     if request.method == "POST":
 
-        # get all user input
-        session["disease-name"] = request.form.get("disease-name")
-        session["disease-id"] = request.form.get("disease-id")
-        session["num-processes"] = request.form.get("num-processes")
-        session["email"] = request.form.get("email")
-        session["api-key"] = request.form.get("api-key")
-        session["remove-terms"] = request.form.get("remove-terms")
-        return render_template("loading.html")
+        # identify what form was submitted
+        form_id = request.form.get('form_id')
 
-@views.route("/data")
+        if form_id == "form1":
+
+            # start with new database on every run
+            resetDatabase()
+
+            # get all user input
+            session["disease-name"] = request.form.get("disease-name")
+            session["disease-id"] = request.form.get("disease-id")
+            session["num-processes"] = request.form.get("num-processes")
+            session["email"] = request.form.get("email")
+            session["api-key"] = request.form.get("api-key")
+            session["remove-terms"] = request.form.get("remove-terms")
+
+            return render_template("loading.html", disease_name = session["disease-name"])
+        
+        elif form_id == "form2":
+            session["associated-disease"] = request.form.get("associated-disease")
+
+            return render_template("loading.html", disease_name = session["associated-disease"])
+            
+
+@views.route("/data", methods=["POST", "GET"])
 def data():
-    
-    getLitData(session["disease-name"], int(session["num-processes"]), session["email"], session["remove-terms"])
 
-    return render_template("data.html", 
-                           compounds=compoundScoringData.query.all(), 
-                           features=featureScoringData.query.all(), 
-                           diseases=associatedDiseases.query.all(),
-                           abstracts=queryData.query.first())
+    if "associated-disease" in session:
+
+        getLitData(session["associated-disease"], int(session["num-processes"]), session["email"], session["remove-terms"])
+
+        return render_template("data.html", 
+                        data_type="associated-disease",
+                        compounds=compoundScoringData.query.filter_by(search=session["associated-disease"]), 
+                        features=featureScoringData.query.filter_by(search=session["associated-disease"]), 
+                        diseases=associatedDiseases.query.filter_by(search=session["associated-disease"]),
+                        abstracts=queryData.query.filter_by(search=session["associated-disease"]).first())
+    
+    elif "disease-name" in session:
+
+        getLitData(session["disease-name"], int(session["num-processes"]), session["email"], session["remove-terms"])
+
+        return render_template("data.html",
+                            data_type="original-disease",
+                            compounds=compoundScoringData.query.filter_by(search=session["disease-name"]), 
+                            features=featureScoringData.query.filter_by(search=session["disease-name"]), 
+                            diseases=associatedDiseases.query.filter_by(search=session["disease-name"]),
+                            abstracts=queryData.query.filter_by(search=session["disease-name"]).first())
+        
+    else:
+        error_message = "No disease name defined, please return to home page."
+        return render_template("error.html", message = error_message)
+         
 
 @views.route("/tutorial")
 def tutorial():

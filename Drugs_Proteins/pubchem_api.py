@@ -18,18 +18,16 @@ def get_smiles_from_pubchem(drug_names):
                     smiles_dict[drug] = smiles
                 else:
                     smiles_dict[drug] = "No SMILES found"
-            else:
-                smiles_dict[drug] = f"Error: {response.status_code}"
 
         except Exception as e:
             smiles_dict[drug] = f"Error: {str(e)}"
 
     return smiles_dict
 
-# List of drugs
-drug_list = ["sudafed", "visine", "riociguat", "oxycodone"]
-smiles_results = get_smiles_from_pubchem(drug_list)
+def check_if_drug(drug_names):
+    """
+    Returns drug in list if drug SMILES string is found
+    """
+    smiles_results = set(get_smiles_from_pubchem(drug_names).keys())
 
-# Print results
-for drug, smiles in smiles_results.items():
-    print(f"{drug}: {smiles}")
+    return smiles_results
