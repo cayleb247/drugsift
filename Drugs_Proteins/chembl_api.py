@@ -79,3 +79,12 @@ def getDrugData(drug_list: list):
     drug_smiles = getDrugSMILES(drug_ids)
 
     return(drug_smiles)
+
+def check_if_drug(drug_names: list):
+    """
+    Returns drug in list if drug SMILES string is found
+    """
+    smiles_results = set([drug["name"].lower() for drug in getDrugData(drug_names)])
+
+    return smiles_results
+

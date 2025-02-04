@@ -1,14 +1,17 @@
 from flask import Blueprint, render_template, request, session, url_for, redirect
 from main import getLitData
 from main import resetDatabase
+from main import runWord2Vec
 from . import db
 from .models import queryData
 import json
+
 
 from website.models import queryData
 from website.models import featureScoringData
 from website.models import compoundScoringData
 from website.models import associatedDiseases
+from website.models import cosineSimilarity
 
 
 views = Blueprint('views', __name__)
@@ -29,6 +32,8 @@ def loading():
 
         if form_id == "form1":
 
+            session.clear()
+
             # start with new database on every run
             resetDatabase()
 
@@ -40,18 +45,32 @@ def loading():
             session["api-key"] = request.form.get("api-key")
             session["remove-terms"] = request.form.get("remove-terms")
 
-            return render_template("loading.html", disease_name = session["disease-name"])
+            return render_template("loading.html", load_type = "disease", disease_name = session["disease-name"])
         
         elif form_id == "form2":
             session["associated-disease"] = request.form.get("associated-disease")
 
-            return render_template("loading.html", disease_name = session["associated-disease"])
+            return render_template("loading.html", load_type = "disease", disease_name = session["associated-disease"])
+        
+        elif form_id == "w2v":
+            session["word2vec_term"] = request.form.get("w2v-disease")
+
+            return render_template("loading.html", load_type = "w2v", prediction_term = session["word2vec_term"])
+
             
 
 @views.route("/data", methods=["POST", "GET"])
 def data():
 
-    if "associated-disease" in session:
+    if "word2vec_term" in session:
+
+        runWord2Vec(session["word2vec_term"])
+
+        return render_template("data.html", data_type = "w2v",
+                                prediction_term = session["word2vec_term"],
+                                w2v_terms = cosineSimilarity.query.all())
+
+    elif "associated-disease" in session:
 
         getLitData(session["associated-disease"], int(session["num-processes"]), session["email"], session["remove-terms"])
 

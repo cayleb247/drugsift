@@ -1,10 +1,12 @@
 # from Misc.logging_ import logger
 from flask import session
+import os
 
 from website.models import queryData
 from website.models import featureScoringData
 from website.models import compoundScoringData
 from website.models import associatedDiseases
+from website.models import cosineSimilarity
 
 from website import db, create_app
 
@@ -15,9 +17,13 @@ from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstra
 from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor, DiseaseTermsExtractor
 from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
-from Drugs_Proteins.pubchem_api import check_if_drug
+from Models.word_2_vec import train_word2vec_model, top_related_drugs
+
+from Drugs_Proteins.chembl_api import check_if_drug
 
 from Models import word_2_vec
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[]):
     '''
@@ -158,3 +164,24 @@ def resetDatabase():
 
         db.drop_all()
         db.create_all() 
+
+def runWord2Vec(search_term):
+
+    app = create_app()
+
+    # Configuration
+    connection_string = f"sqlite:///{os.path.join(current_dir, '.', 'instance', 'data.db')}"
+    abstract_column_name = "abstract"  # Replace with your actual column name
+    
+    # Train the model
+    model = train_word2vec_model(connection_string, abstract_column_name)
+    
+    drug_df = top_related_drugs(model, search_term)
+
+    records = drug_df.to_dict(orient='records')
+
+    with app.app_context():
+        feature_data = [cosineSimilarity(search=record["search_query"], term=record["term"], cosine_similarity=record["cosine_similarity"]) for record in records]
+        db.session.bulk_save_objects(feature_data)
+        db.session.commit()
+

@@ -3,14 +3,27 @@
 {% block title %}Loading{% endblock %}
 
 {% block content %}
-    <div class="loading-container">
-        <h1>Pipeline Working</h1><br>
+    {% if load_type == "disease" %}
+        <div class="loading-container">
+            <h1>Pipeline Working</h1><br>
 
-        <h2>Getting data for</h2>
-        <p>"{{disease_name}}"</p>
+            <h2>Getting data for</h2>
+            <p>{{disease_name}}</p>
+        
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+
+    {% elif load_type == "w2v" %}
+    <div class="loading-container">
+        <h1>Word2Vec Model Training</h1><br>
+
+        <h2>User Prediction Term</h2>
+        <p>{{prediction_term}}</p>
     
         <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
     </div>
+    {% endif %}
+    
     
 
 {% endblock %}

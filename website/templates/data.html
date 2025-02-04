@@ -3,76 +3,101 @@
 {% block title %}Tutorial{% endblock %}
 
 {% block content %}
-    <div class="data-heading">
-        <h1>Data Summary</h1>
-        <p>Number of Abstracts Retrieved: {{abstracts.retrieved}}</p>
-        <p>Number of Abstracts Available: {{abstracts.total}}</p>
-    </div>
-    
+
+    {% if data_type == "original-disease" or data_type == "associated-disease" %}
+        <div class="data-heading">
+            <h1>Data Summary</h1>
+            <p>Number of Abstracts Retrieved: {{abstracts.retrieved}}</p>
+            <p>Number of Abstracts Available: {{abstracts.total}}</p>
+        </div>
+        
 
 
-    <h2>Extracted Compounds</h2>
-    <p><em>May contain noise</em></p>
-    <div class="table-container" id="output-table">
-        <table id="compounds" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Term</th>
-                    <th>TF-IDF Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for compound in compounds %}
+        <h2>Extracted Compounds</h2>
+        <p><em>May contain noise</em></p>
+        <div class="table-container" id="output-table">
+            <table id="compounds" class="display" style="width:100%">
+                <thead>
                     <tr>
-                        <td>{{compound.compound_term}}</td>
-                        <td>{{compound.tfidf_score}}</td>
+                        <th>Term</th>
+                        <th>TF-IDF Score</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for compound in compounds %}
+                        <tr>
+                            <td>{{compound.compound_term}}</td>
+                            <td>{{compound.tfidf_score}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <h2>Extracted Diseases</h2>
-    <p><em>May contain noise</em></p>
-    <div class="table-container" id="output-table">
-        <table id="features" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Term</th>
-                    <th>TF-IDF Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for feature in features %}
+        <h2>Extracted Features</h2>
+        <p><em>May contain noise</em></p>
+        <div class="table-container" id="output-table">
+            <table id="features" class="display" style="width:100%">
+                <thead>
                     <tr>
-                        <td>{{feature.feature_term}}</td>
-                        <td>{{feature.tfidf_score}}</td>
+                        <th>Term</th>
+                        <th>TF-IDF Score</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for feature in features %}
+                        <tr>
+                            <td>{{feature.feature_term}}</td>
+                            <td>{{feature.tfidf_score}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <h2>Associated Diseases</h2>
-    <p><em>May contain noise</em></p>
-    <div class="table-container" id="output-table">
-        <table id="diseases" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Term</th>
-                    <th>Frequency</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for disease in diseases %}
+        <h2>Associated Diseases</h2>
+        <p><em>May contain noise</em></p>
+        <div class="table-container" id="output-table">
+            <table id="diseases" class="display" style="width:100%">
+                <thead>
                     <tr>
-                        <td>{{disease.disease_term}}</td>
-                        <td>{{disease.frequency}}</td>
+                        <th>Term</th>
+                        <th>Frequency</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for disease in diseases %}
+                        <tr>
+                            <td>{{disease.disease_term}}</td>
+                            <td>{{disease.frequency}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% elif data_type == "w2v" %}
+        <div class="data-heading">
+            <h1>Word2Vec Summary</h1>
+        </div>
+        <div class="table-container" id="output-table">
+            <table id="diseases" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>Cosine Similarity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for term in w2v_terms %}
+                        <tr>
+                            <td>{{term.term}}</td>
+                            <td>{{term.cosine_similarity}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
     {% if data_type == "original-disease"%}
         <div class="disease-container">
@@ -91,7 +116,20 @@
             <h2>Train Word2Vec Model</h2>
             <p>Create associations between terms</p>
             <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
+                <input type="hidden" name="form_id" value="w2v">
+                <label for="disease-name">Prediction Term</label>
+                <input type="text" id="disease-name" name="w2v-disease" placeholder="venous thrombosis">
                 <button type="submit">Train Model</button>
+            </form>
+        </div>
+
+    {% elif data_type == "w2v" %}
+        <div class="disease-container">
+            <h2>Use GraphConv Model</h2>
+            <p>Generate Drug-Target Affinities</p>
+            <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
+                <input type="hidden" name="form_id" value="graph-model">
+                <button type="submit">Use Model</button>
             </form>
         </div>
     {% endif %}

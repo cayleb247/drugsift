@@ -42,3 +42,11 @@ class associatedDiseases(db.Model):
     def __repr__(self):
         return f"<associatedDiseases(id={self.id}, search='{self.search}', disease_term='{self.disease_term}', frequency={self.frequency})>"
     
+class cosineSimilarity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    search = db.Column(db.String(150))
+    term = db.Column(db.String(100))
+    cosine_similarity = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<cosineSimilarity(id={self.id}, search='{self.search}', term='{self.term}', cosine_similarity={self.cosine_similarity})>"
