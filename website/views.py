@@ -5,6 +5,7 @@ from main import runWord2Vec
 from . import db
 from .models import queryData
 import json
+import subprocess
 
 
 from website.models import queryData
@@ -44,6 +45,10 @@ def loading():
             session["email"] = request.form.get("email")
             session["api-key"] = request.form.get("api-key")
             session["remove-terms"] = request.form.get("remove-terms")
+
+            # add the user's API-Key for the session
+            if "api-key" in session:
+                subprocess.run(f'export NCBI_API_KEY={session["api-key"]}', shell=True)
 
             return render_template("loading.html", load_type = "disease", disease_name = session["disease-name"])
         
