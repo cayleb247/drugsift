@@ -88,7 +88,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     # breakpoint()
 
     # process feature data
-    feature_extractor = ClinicalFeaturesExtractor("Data/clinical_features.csv", remove_terms)
+    feature_extractor = ClinicalFeaturesExtractor(os.path.join(current_dir, 'Data', 'clinical_features.csv'), remove_terms)
     features = feature_extractor.extract_clinical_features(n_process, abstract_df["lemmas"].to_list())
     feature_intervals = abstract_df["year-published"].to_list()
 
@@ -112,7 +112,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     # logger.info("Features successfully placed in db")
 
     # process compound data
-    compound_extractor = DrugCompoundExtractor("Data/stems.csv", "Data/words.txt")
+    compound_extractor = DrugCompoundExtractor(os.path.join(current_dir, 'Data', 'stems.csv'), os.path.join(current_dir, 'Data', 'words.txt'))
     compounds = compound_extractor.extract_drug_compounds(n_process, abstract_df["lemmas"].to_list())
     # compounds = check_if_drug(list(compounds)) # denoise compound list by checking for SMILES string
 
