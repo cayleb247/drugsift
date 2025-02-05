@@ -21,7 +21,7 @@ views = Blueprint('views', __name__)
 @views.route("/", methods=["POST", "GET"])
 @views.route("/home", methods=["POST", "GET"])
 def home():
-    with open(os.path.join(current_dir, 'Data', 'disease_table.json'), 'r') as file:
+    with open(os.path.join(current_dir, '..', 'Data', 'disease_table.json'), 'r') as file:
         data = json.load(file)
     return render_template("index.html", disease_data=data)
     
