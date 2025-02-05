@@ -6,7 +6,7 @@ from . import db
 from .models import queryData
 import json
 import subprocess
-
+import os
 
 from website.models import queryData
 from website.models import featureScoringData
@@ -14,13 +14,14 @@ from website.models import compoundScoringData
 from website.models import associatedDiseases
 from website.models import cosineSimilarity
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 views = Blueprint('views', __name__)
 
 @views.route("/", methods=["POST", "GET"])
 @views.route("/home", methods=["POST", "GET"])
 def home():
-    with open('Data/disease_table.json', 'r') as file:
+    with open(os.path.join(current_dir, 'Data', 'disease_table.json'), 'r') as file:
         data = json.load(file)
     return render_template("index.html", disease_data=data)
     
