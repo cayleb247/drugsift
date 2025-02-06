@@ -74,7 +74,7 @@ class ClinicalFeaturesExtractor:
         Returns:
         list: list of drug terms
         '''
-        return [word for word in abstract if self.clinical_features_pattern.search(word) and word not in self.remove_terms]
+        return [word.lower() for word in abstract if self.clinical_features_pattern.search(word.lower()) and word.lower() not in self.remove_terms]
     
     def extract_clinical_features(self, n_process: int, abstracts: list):
         '''

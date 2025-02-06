@@ -14,14 +14,23 @@
         </div>
 
     {% elif load_type == "w2v" %}
-    <div class="loading-container">
-        <h1>Word2Vec Model Training</h1><br>
+        <div class="loading-container">
+            <h1>Word2Vec Model Training</h1><br>
 
-        <h2>User Prediction Term</h2>
-        <p>{{prediction_term}}</p>
-    
-        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-    </div>
+            <h2>User Prediction Term</h2>
+            <p>{{prediction_term}}</p>
+        
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+    {% elif load_type == "graph-model" %}
+        <div class="loading-container">
+            <h1>Model Inference Loading</h1><br>
+
+            <h2>Inputted UniProt ID</h2>
+            <p>{{disease_id}}</p>
+        
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
     {% endif %}
     
     

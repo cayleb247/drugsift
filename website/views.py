@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, session, url_for, redirec
 from main import getLitData
 from main import resetDatabase
 from main import runWord2Vec
+from main import protein_extactor
 from . import db
 from .models import queryData
 import json
@@ -51,6 +52,10 @@ def loading():
             if "api-key" in session:
                 subprocess.run(f'export NCBI_API_KEY={session["api-key"]}', shell=True)
 
+            # get a list of protein's amino acids from the inputted disease-id
+            # if "disease-id" in session:      
+            #     session["aa_seqs"] = protein_extactor(session["disease-id"])
+
             return render_template("loading.html", load_type = "disease", disease_name = session["disease-name"])
         
         elif form_id == "form2":
@@ -62,6 +67,11 @@ def loading():
             session["word2vec_term"] = request.form.get("w2v-disease")
 
             return render_template("loading.html", load_type = "w2v", prediction_term = session["word2vec_term"])
+        
+        elif form_id == "graph-model":
+            
+            return render_template("loading.html", load_type = "graph-model", disease_id = session["disease-id"])
+
 
             
 

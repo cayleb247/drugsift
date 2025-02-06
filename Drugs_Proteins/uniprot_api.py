@@ -39,11 +39,3 @@ def get_protein_sequence(accession_id):
         return sequence
     else:
         raise Exception(f"Failed to fetch data. Status code: {response.status_code}")
-    
-def protein_extactor(disease_id):
-
-  protein_accessions = get_protein_accession(disease_id)
-
-  protein_seqs = map(get_protein_sequence, protein_accessions)
-
-  return list(protein_seqs)

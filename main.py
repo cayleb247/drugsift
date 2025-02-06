@@ -21,7 +21,7 @@ from Models.word_2_vec import train_word2vec_model, top_related_drugs
 
 from Drugs_Proteins.chembl_api import check_if_drug
 
-from Models import word_2_vec
+from Drugs_Proteins.uniprot_api import get_protein_accession, get_protein_sequence
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -185,3 +185,13 @@ def runWord2Vec(search_term):
         db.session.bulk_save_objects(feature_data)
         db.session.commit()
 
+def protein_extactor(disease_id):
+  '''
+  Returns a list of amino acid sequences given a UniProt disease ID
+  '''
+
+  protein_accessions = get_protein_accession(disease_id)
+
+  protein_seqs = map(get_protein_sequence, protein_accessions)
+
+  return list(protein_seqs)

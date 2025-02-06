@@ -4,4 +4,4 @@ from website.models import compoundScoringData
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(port=33061)
+    app.run(debug=True)
