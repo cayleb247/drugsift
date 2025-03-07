@@ -52,7 +52,7 @@ def train_word2vec_model(connection_string, abstract_column_name):
     
     try:
         # Train the Word2Vec model using the sentences
-        model = gensim.models.Word2Vec(sentences=sentences)
+        model = gensim.models.Word2Vec(sentences=sentences, sg=1)
         return model
     finally:
         # Ensure database connection is closed
@@ -92,9 +92,9 @@ def top_related_drugs(model, search_term: str):
             {
                 'search_query': search_term,
                 'term': word,
-                'cosine_similarity': cosine_similarity(model.wv[search_term], model.wv[word])
+                'cosine_similarity': cosine_similarity(model.wv[search_term], model.wv[word]),
+                'corpus': corpus
             }
-            for word in [item.compound_term for item in compoundScoringData.query.all() if item.compound_term in set(model.wv.key_to_index.keys())]
+            for word, corpus in [(item.compound_term, item.search) for item in compoundScoringData.query.all() if item.compound_term in set(model.wv.key_to_index.keys())]
         ])
     return df
-

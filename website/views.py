@@ -8,12 +8,30 @@ from .models import queryData
 import json
 import subprocess
 import os
+import sys
 
 from website.models import queryData
 from website.models import featureScoringData
 from website.models import compoundScoringData
 from website.models import associatedDiseases
 from website.models import cosineSimilarity
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+
+repo_dir = os.path.dirname(os.path.abspath(__file__))  # Path to the current script
+project_root = os.path.abspath(os.path.join(repo_dir, ".."))  # One level up to /drugsift
+ssm_dta_dir = os.path.join(project_root, "SSM_DTA")  # Path to /drugsift/SSM_DTA
+
+if ssm_dta_dir not in sys.path:  # Avoid duplicates
+    sys.path.append(ssm_dta_dir)
+
+from SSM_DTA.infer import run_inference
+from SSM_DTA.preprocess.add_space import run_add_space
+from SSM_DTA.preprocess.canonicalize import run_canonicalization
+from SSM_DTA.preprocess.tokenize_re import run_tokenization
+
+from Drugs_Proteins.pubchem_api import get_smiles_from_pubchem
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,18 +61,25 @@ def loading():
             # get all user input
             session["disease-name"] = request.form.get("disease-name")
             session["disease-id"] = request.form.get("disease-id")
-            session["num-processes"] = request.form.get("num-processes")
+            session["num-processes"] = int(request.form.get("num-processes"))
             session["email"] = request.form.get("email")
             session["api-key"] = request.form.get("api-key")
             session["remove-terms"] = request.form.get("remove-terms")
 
             # add the user's API-Key for the session
-            if "api-key" in session:
+            if not session["api-key"] == "":
                 subprocess.run(f'export NCBI_API_KEY={session["api-key"]}', shell=True)
 
             # get a list of protein's amino acids from the inputted disease-id
-            # if "disease-id" in session:      
-            #     session["aa_seqs"] = protein_extactor(session["disease-id"])
+            if not session["disease-id"] == "":  
+                print("disease-id" in session)
+                print(session["disease-id"])
+                breakpoint()
+                session["aa_seqs"] = protein_extactor(session["disease-id"])
+                session["num_seqs"] = len(session["aa_seqs"])
+
+            # TO TEST THE MODEL
+            session["model"] = True
 
             return render_template("loading.html", load_type = "disease", disease_name = session["disease-name"])
         
@@ -68,12 +93,11 @@ def loading():
 
             return render_template("loading.html", load_type = "w2v", prediction_term = session["word2vec_term"])
         
-        elif form_id == "graph-model":
+        elif form_id == "model":
+            session["model"] = True
             
-            return render_template("loading.html", load_type = "graph-model", disease_id = session["disease-id"])
-
-
-            
+            return render_template("loading.html", load_type = "model", disease_id = session["disease-id"])
+ 
 
 @views.route("/data", methods=["POST", "GET"])
 def data():

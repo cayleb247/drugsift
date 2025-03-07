@@ -88,3 +88,4 @@ def check_if_drug(drug_names: list):
 
     return smiles_results
 
+# print(getDrugData(["riociguat"]))

@@ -75,7 +75,7 @@
                 </tbody>
             </table>
         </div>
-    {% elif data_type == "w2v" %}
+        {% elif data_type == "w2v" %}
         <div class="data-heading">
             <h1>Word2Vec Summary</h1>
         </div>
@@ -85,6 +85,7 @@
                     <tr>
                         <th>Term</th>
                         <th>Cosine Similarity</th>
+                        <th>Corpus</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,6 +93,7 @@
                         <tr>
                             <td>{{term.term}}</td>
                             <td>{{term.cosine_similarity}}</td>
+                            <td>{{term.corpus}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

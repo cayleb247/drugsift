@@ -53,6 +53,10 @@ class HybridTemporalTFIDF:
         years_from_present = max_year - interval
         return np.exp(-self.recency_weight * years_from_present)
     
+    def _normalize_year_intervals(self, intervals: list) -> list:
+        
+        return [interval for interval in intervals if isinstance(interval, int)]
+    
     def fit(self, documents: List[List[str]], intervals: List[Union[str, int]]):
         """
         Fit the model on documents with their corresponding intervals.
@@ -125,6 +129,9 @@ class HybridTemporalTFIDF:
         """
         Get comprehensive scoring for terms across all intervals.
         """
+
+        self.intervals = self._normalize_year_intervals(self.intervals)
+
         results = []
         
         for term in terms:

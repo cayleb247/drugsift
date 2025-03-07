@@ -1,6 +1,7 @@
 # from Misc.logging_ import logger
 from flask import session
 import os
+import sys
 
 from website.models import queryData
 from website.models import featureScoringData
@@ -14,7 +15,7 @@ import pandas as pd
 from multiprocessing import Pool
 
 from Data_Magagement.data_collection import get_pubmed_count, get_queried_abstracts
-from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, DrugCompoundExtractor, DiseaseTermsExtractor
+from Data_Magagement.data_processing import lemmatize_abstracts, ClinicalFeaturesExtractor, RxNormDrugCompoundExtractor, DiseaseTermsExtractor
 from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
 from Models.word_2_vec import train_word2vec_model, top_related_drugs
@@ -61,9 +62,6 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     print(f"Able to retrieve {retrieved_abstracts} abstracts")
 
     abstract_df["lemmas"] = lemmatize_abstracts(abstract_df["abstract"].to_list())
-
-    # print(abstract_df.head())
-    # breakpoint()
 
     # logger.info("Abstracts successfully retrived and lemmatized")
 
@@ -112,7 +110,7 @@ def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[])
     # logger.info("Features successfully placed in db")
 
     # process compound data
-    compound_extractor = DrugCompoundExtractor(os.path.join(current_dir, 'Data', 'stems.csv'), os.path.join(current_dir, 'Data', 'words.txt'))
+    compound_extractor = RxNormDrugCompoundExtractor("Data/rxnorm_drugs.csv", "Data/words.txt")
     compounds = compound_extractor.extract_drug_compounds(n_process, abstract_df["lemmas"].to_list())
     # compounds = check_if_drug(list(compounds)) # denoise compound list by checking for SMILES string
 
@@ -181,9 +179,10 @@ def runWord2Vec(search_term):
     records = drug_df.to_dict(orient='records')
 
     with app.app_context():
-        feature_data = [cosineSimilarity(search=record["search_query"], term=record["term"], cosine_similarity=record["cosine_similarity"]) for record in records]
+        feature_data = [cosineSimilarity(search=record["search_query"], term=record["term"], cosine_similarity=record["cosine_similarity"], corpus=record["corpus"]) for record in records]
         db.session.bulk_save_objects(feature_data)
         db.session.commit()
+
 
 def protein_extactor(disease_id):
   '''
@@ -195,3 +194,14 @@ def protein_extactor(disease_id):
   protein_seqs = map(get_protein_sequence, protein_accessions)
 
   return list(protein_seqs)
+
+
+
+# run_inference(os.path.join(current_dir, 'Models', 'bindingdb_Ki_SSM.pt'),
+#                       os.path.join(current_dir, 'SSM_DTA', 'dict'),
+#                       os.path.join(current_dir, 'SSM_DTA', 'example.mol.can.re'),
+#                       os.path.join(current_dir, 'SSM_DTA', 'example.pro.addspace'),
+#                       os.path.join(current_dir, 'SSM_DTA', 'example_pred.txt'),
+#                       8,
+#                       None,
+#                       "predict")

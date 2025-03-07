@@ -47,6 +47,7 @@ class cosineSimilarity(db.Model):
     search = db.Column(db.String(150))
     term = db.Column(db.String(100))
     cosine_similarity = db.Column(db.Float)
+    corpus = db.Column(db.String(150))
 
     def __repr__(self):
-        return f"<cosineSimilarity(id={self.id}, search='{self.search}', term='{self.term}', cosine_similarity={self.cosine_similarity})>"
+        return f"<cosineSimilarity(id={self.id}, search='{self.search}', term='{self.term}', cosine_similarity={self.cosine_similarity}, corpus={self.corpus})>"
