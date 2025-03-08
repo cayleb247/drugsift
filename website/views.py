@@ -101,6 +101,8 @@ def loading():
 
 @views.route("/data", methods=["POST", "GET"])
 def data():
+    # if session["model"]:
+
 
     if "word2vec_term" in session:
 

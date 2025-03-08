@@ -50,7 +50,7 @@ def getDrugIds(drug_list: list):
 
     return drug_data
 
-def getDrugSMILES(drug_list):
+def getDrugs(drug_list):
 
     for drug in drug_list:
         url = f"https://www.ebi.ac.uk/chembl/api/data/molecule/{drug['chembl_id']}.json"
@@ -60,8 +60,23 @@ def getDrugSMILES(drug_list):
 
         if response.status_code == 200:
             data = response.json()
-            smiles = data.get("molecule_structures", {}).get("canonical_smiles", "No SMILES found")
-            drug["SMILES"] = smiles
+            try:
+                smiles = data.get("molecule_structures", {}).get("canonical_smiles", "No SMILES found")
+
+                drug["SMILES"] = smiles
+
+            except:
+                print(f"No SMILES string for {drug['name']}")
+
+            try:
+                formula = data.get("molecule_properties", {}).get("full_molformula", "No formula found")
+
+                drug["Formula"] = formula
+
+            except:
+                print(f"No formula for {drug['name']}")
+            
+            
             
         else:
             print("Error fetching data from ChEMBL API")
@@ -76,9 +91,9 @@ def getDrugData(drug_list: list):
 
     drug_ids = getDrugIds(drug_list)
 
-    drug_smiles = getDrugSMILES(drug_ids)
+    drug_data = getDrugs(drug_ids)
 
-    return(drug_smiles)
+    return(drug_data)
 
 def check_if_drug(drug_names: list):
     """
@@ -88,4 +103,4 @@ def check_if_drug(drug_names: list):
 
     return smiles_results
 
-# print(getDrugData(["riociguat"]))
+# print(getDrugData(["benfotiamine", "eteplirsen", "ataluren", "trametinib", "clobetasol", "trimetazidine", "xaliproden", "taurursodiol", "levosimendan", "clemastine"]))

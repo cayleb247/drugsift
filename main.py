@@ -20,13 +20,21 @@ from Data_Magagement.data_scoring import HybridTemporalTFIDF
 
 from Models.word_2_vec import train_word2vec_model, top_related_drugs
 
-from Drugs_Proteins.chembl_api import check_if_drug
+from Drugs_Proteins.chembl_api import getDrugData
 
 from Drugs_Proteins.uniprot_api import get_protein_accession, get_protein_sequence
 
+from admet_ai import ADMETModel
+
+# Add the SSM_DTA directory to the path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SSM_DTA'))
+
+# Now import
+from SSM_DTA.infer import SSM_DTA
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-def getLitData(search_query: str, n_process=8, email=None, user_remove_terms=[]):
+def getLitData(search_query: str, n_process=8, email="calebtw10@gmail.com", user_remove_terms=[]):
     '''
     Processes an entire disease query
 
@@ -188,20 +196,53 @@ def protein_extactor(disease_id):
   '''
   Returns a list of amino acid sequences given a UniProt disease ID
   '''
+  proteins = []
 
   protein_accessions = get_protein_accession(disease_id)
 
-  protein_seqs = map(get_protein_sequence, protein_accessions)
+  for protein_accession in protein_accessions:
+      protein_dict = {}
+      protein_dict["chembl_accession"] = protein_accession
+      protein_dict["sequence"] = get_protein_sequence(protein_accession)
+      proteins.append(protein_dict)
 
-  return list(protein_seqs)
+  return proteins
 
 
+def getAverageAffinity(scores: list):
+    '''
+    Find the average binding affinity of a drug to the disease's proteins
+    '''
+    scores = [float(score) for score in scores]
 
-# run_inference(os.path.join(current_dir, 'Models', 'bindingdb_Ki_SSM.pt'),
-#                       os.path.join(current_dir, 'SSM_DTA', 'dict'),
-#                       os.path.join(current_dir, 'SSM_DTA', 'example.mol.can.re'),
-#                       os.path.join(current_dir, 'SSM_DTA', 'example.pro.addspace'),
-#                       os.path.join(current_dir, 'SSM_DTA', 'example_pred.txt'),
-#                       8,
-#                       None,
-#                       "predict")
+    return sum(scores) / len(scores)
+
+def generateDrugProfiles(drug_list: list, disease_id: str):
+    '''
+    Generate the a drug profile including model predicted binding affinity, SMILES string, and ADMET
+    '''
+    predictor = SSM_DTA("Models/bindingdb_Ki_SSM.pt", "SSM_DTA/dict")
+
+    drug_profiles = getDrugData(drug_list)
+
+    proteins = protein_extactor(disease_id)
+
+    # run prediction using SSM-DTA
+    for drug in drug_profiles:
+        if "SMILES" in drug:
+
+            drug["scores"] = {}
+            for protein in proteins:
+                score = predictor.run_inference(drug["SMILES"], protein["sequence"])
+                drug["scores"][protein["chembl_accession"]] = score
+            drug["average_score"] = getAverageAffinity(list(drug["scores"].values()))
+        
+    
+    return drug_profiles
+
+# print(generateDrugProfiles(["benfotiamine", "eteplirsen", "ataluren", "trametinib", "clobetasol", "trimetazidine", "xaliproden", "taurursodiol", "levosimendan", "clemastine"], "DI-00001"))
+# breakpoint()
+            
+
+# print(getDrugData(["benfotiamine", "eteplirsen", "ataluren", "trametinib", "clobetasol", "trimetazidine", "xaliproden", "taurursodiol", "levosimendan", "clemastine"]))
+# breakpoint()

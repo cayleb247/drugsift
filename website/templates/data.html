@@ -127,8 +127,8 @@
 
     {% elif data_type == "w2v" %}
         <div class="disease-container">
-            <h2>Use GraphConv Model</h2>
-            <p>Generate Drug-Target Affinities</p>
+            <h2>Use SSM-DTA Model</h2>
+            <p>Trained on BindingDB to Predict Ki Scores</p>
             <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
                 <input type="hidden" name="form_id" value="graph-model">
                 <button type="submit">Use Model</button>
