@@ -223,6 +223,8 @@ def generateDrugProfiles(drug_list: list, disease_id: str):
     '''
     predictor = SSM_DTA("Models/bindingdb_Ki_SSM.pt", "SSM_DTA/dict")
 
+    admet_model = ADMETModel()
+
     drug_profiles = getDrugData(drug_list)
 
     proteins = protein_extactor(disease_id)
@@ -236,6 +238,8 @@ def generateDrugProfiles(drug_list: list, disease_id: str):
                 score = predictor.run_inference(drug["SMILES"], protein["sequence"])
                 drug["scores"][protein["chembl_accession"]] = score
             drug["average_score"] = getAverageAffinity(list(drug["scores"].values()))
+
+            drug["ADMET_props"] = admet_model.predict(smiles=drug["SMILES"])
         
     
     return drug_profiles

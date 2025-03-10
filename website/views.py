@@ -3,6 +3,7 @@ from main import getLitData
 from main import resetDatabase
 from main import runWord2Vec
 from main import protein_extactor
+from main import generateDrugProfiles
 from . import db
 from .models import queryData
 import json
@@ -15,6 +16,8 @@ from website.models import featureScoringData
 from website.models import compoundScoringData
 from website.models import associatedDiseases
 from website.models import cosineSimilarity
+
+from Drugs_Proteins.uniprot_api import protein_seq_main
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
@@ -93,18 +96,22 @@ def loading():
 
             return render_template("loading.html", load_type = "w2v", prediction_term = session["word2vec_term"])
         
-        elif form_id == "model":
-            session["model"] = True
+        elif form_id == "drug-profiles":
+            session["profiles"] = True
             
-            return render_template("loading.html", load_type = "model", disease_id = session["disease-id"])
+            return render_template("loading.html", load_type = "drug-profiles", disease_id = session["disease-id"])
  
 
 @views.route("/data", methods=["POST", "GET"])
 def data():
-    # if session["model"]:
+    if "profiles" in session:
 
+        drug_profiles = generateDrugProfiles([item.term for item in cosineSimilarity.query.all()], session["disease-id"])
 
-    if "word2vec_term" in session:
+        return render_template("data.html", data_type = "drug-profiles",
+                               drug_profiles=drug_profiles)
+
+    elif "word2vec_term" in session:
 
         runWord2Vec(session["word2vec_term"])
 

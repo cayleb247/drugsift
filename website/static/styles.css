@@ -179,7 +179,7 @@ footer {
     font-weight: 300;
 }
 
-dialog {
+.main-content dialog {
     border: 1px solid grey;
     border-radius: 1rem;
     top: calc(50%);
@@ -212,7 +212,7 @@ dialog {
     border: 1px solid rgba(128, 128, 128, 0.5);
 }
 
-dialog svg {
+.main-content dialog svg {
     stroke: gray;
     position: absolute;
     top: 0.5rem;
@@ -220,11 +220,11 @@ dialog svg {
     cursor: pointer;
 }
 
-dialog svg:hover {
+.main-content dialog svg:hover {
     stroke: rgba(128, 128, 128, 0.5);
 }
 
-dialog button {
+.main-content dialog button {
     font-weight: 500;
     color: white;
     background-color: #264854;
@@ -355,7 +355,41 @@ dialog button {
     align-items: center;
 }
 
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
+.drug-profile {
+    display: flex;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 1rem;
+}
 
+.drug-image {
+    height: 3rem;
+    width: auto;
+}
 
+.drug-overview {
+    display: flex;
+    flex-direction: column;
+}
 
+.profile-container dialog {
+    border: 1px solid grey;
+    border-radius: 1rem;
+    top: calc(50%);
+    left: calc(50%);
+    transform: translate(-50%, -50%);
+}
+
+.profile-container .dialog-content {
+    width: 100%;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

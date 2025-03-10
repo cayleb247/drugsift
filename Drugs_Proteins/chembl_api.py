@@ -102,5 +102,3 @@ def check_if_drug(drug_names: list):
     smiles_results = set([drug["name"].lower() for drug in getDrugData(drug_names)])
 
     return smiles_results
-
-# print(getDrugData(["benfotiamine", "eteplirsen", "ataluren", "trametinib", "clobetasol", "trimetazidine", "xaliproden", "taurursodiol", "levosimendan", "clemastine"]))

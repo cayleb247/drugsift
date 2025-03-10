@@ -99,6 +99,32 @@
                 </tbody>
             </table>
         </div>
+        {% elif data_type == "drug-profiles" %}
+
+        <div class="data-heading">
+            <h1>Drug Profile Summary</h1>
+            <p>Number of drugs listed: {{len(drug-profiles)}} </p>
+        </div>
+
+        <div class="profile-container">
+            {% for drug in drug-profiles %}
+                <div class="drug-profile">
+                    <img class="drug-image" src="https://www.ebi.ac.uk/chembl/api/data/image/{{ drug['chembl_id'] }}" alt="Molecule Image">
+                    <div class="drug-overview">
+                        <h1>{{drug["name"]}}</h1>
+                        <h2>{{drug["Formula"]}}</h2>
+                        <h3>ChEMBL ID: {{drug["chembl_id"]}}</h3>
+                    </div>
+                </div>
+            {% end for %}
+            <dialog>
+                <div class="dialog-content">
+
+                </div>
+            </dialog>
+        </div>
+
+
     {% endif %}
 
     {% if data_type == "original-disease"%}
@@ -127,14 +153,18 @@
 
     {% elif data_type == "w2v" %}
         <div class="disease-container">
-            <h2>Use SSM-DTA Model</h2>
-            <p>Trained on BindingDB to Predict Ki Scores</p>
+            <h2>Use SSM-DTA and ADMET AI</h2>
+            <p>Get Drug Profiles</p>
             <form id="disease-selection" action="{{ url_for('views.loading') }}" method="post">
-                <input type="hidden" name="form_id" value="graph-model">
+                <input type="hidden" name="form_id" value="drug-profiles">
                 <button type="submit">Use Model</button>
             </form>
         </div>
+    {% elif data_type == "drug-profiles" %}
+
     {% endif %}
+
+
     
     
 
@@ -144,4 +174,5 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script src="../static/table.js"></script>
+    <script src="../static/script.js"></script>
 {% endblock %}
